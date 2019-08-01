@@ -354,11 +354,11 @@ class Sticky extends Component {
 
         if (this.props.customEventSubscriptions) {
             this.customSubscribers = this.props.customEventSubscriptions.map(
-                event => window.addEventListener(event, () => window.requestAnimationFrame(() => {
+                subscriptionConfig => window.addEventListener(subscriptionConfig.event, () => window.requestAnimationFrame(() => {
                     setTimeout(() => {
                         this.updateInitialDimension();
                         this.update();
-                    }, 195);
+                    }, subscriptionConfig.delay);
                 }))
             )
         }
