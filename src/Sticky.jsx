@@ -46,6 +46,7 @@ class Sticky extends Component {
         this.bottomBoundaryTarget;
         this.topTarget;
         this.subscribers;
+        this.customSubscribers;
 
         this.state = {
             top: 0, // A top offset from viewport top where Sticky sticks to when scrolling up
@@ -311,6 +312,12 @@ class Sticky extends Component {
         for (var i = subscribers.length - 1; i >= 0; i--) {
             this.subscribers[i].unsubscribe();
         }
+
+        if (this.customSubscribers) {
+            this.customSubscribers.forEach((subscriber, index) => {
+                window.removeEventListener(this.props.customEventSubscriptions[index], subscriber);
+            });
+        }
     }
 
     componentDidMount () {
@@ -344,6 +351,17 @@ class Sticky extends Component {
             subscribe('scroll', this.handleScroll.bind(this), {useRAF: true, enableScrollInfo: true}),
             subscribe('resize', this.handleResize.bind(this), {enableResizeInfo: true})
         ];
+
+        if (this.props.customEventSubscriptions) {
+            this.customSubscribers = this.props.customEventSubscriptions.map(
+                event => window.addEventListener(event, () => window.requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        this.updateInitialDimension();
+                        this.update();
+                    }, 195);
+                }))
+            )
+        }
     }
 
     translate (style, pos) {
@@ -431,7 +449,8 @@ Sticky.propTypes = {
     innerZ: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number
-    ])
+    ]),
+    customEventSubscriptions: PropTypes.arrayOf(PropTypes.string)
 };
 
 Sticky.STATUS_ORIGINAL = STATUS_ORIGINAL;
