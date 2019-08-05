@@ -132,7 +132,11 @@ class Sticky extends Component {
      * @param {Object} options optional top and bottomBoundary new values
      */
     updateInitialDimension (options) {
-        options = options || {}
+        options = options || {};
+
+        if (!this.outerElement || !this.innerElement) {
+            return;
+        }
 
         var outerRect = this.outerElement.getBoundingClientRect();
         var innerRect = this.innerElement.getBoundingClientRect();
